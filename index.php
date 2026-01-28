@@ -1,6 +1,8 @@
 <?php
 require 'db.php';
 
+echo "ธนวัตร รัตนภักดี";
+
 try {
     if ($pdo) {
         echo "<h1>Connected to Database successfully!</h1>";

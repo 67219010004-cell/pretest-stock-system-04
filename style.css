@@ -5,18 +5,18 @@
     --bg-dark: #09090b;
     --bg-card: rgba(23, 23, 28, 0.7);
     --bg-card-hover: rgba(30, 30, 40, 0.8);
-    
+
     --neon-purple: #b026ff;
     --neon-cyan: #00f3ff;
     --neon-green: #00ff9d;
     --neon-red: #ff2a6d;
-    
+
     --text-main: #ffffff;
     --text-muted: #a1a1aa;
-    
+
     --glass-border: 1px solid rgba(255, 255, 255, 0.1);
     --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-    
+
     --font-main: 'Inter', sans-serif;
     --font-heading: 'Orbitron', sans-serif;
 }
@@ -32,7 +32,7 @@ body {
     color: var(--text-main);
     font-family: var(--font-main);
     min-height: 100vh;
-    background-image: 
+    background-image:
         radial-gradient(circle at 10% 20%, rgba(176, 38, 255, 0.1) 0%, transparent 40%),
         radial-gradient(circle at 90% 80%, rgba(0, 243, 255, 0.1) 0%, transparent 40%);
     overflow-x: hidden;
@@ -42,13 +42,16 @@ body {
 ::-webkit-scrollbar {
     width: 8px;
 }
+
 ::-webkit-scrollbar-track {
     background: var(--bg-dark);
 }
+
 ::-webkit-scrollbar-thumb {
     background: #333;
     border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
     background: var(--neon-purple);
 }
@@ -86,7 +89,10 @@ body {
     align-items: center;
     gap: 0.5rem;
 }
-.brand span { color: var(--neon-cyan); }
+
+.brand span {
+    color: var(--neon-cyan);
+}
 
 .nav-links {
     list-style: none;
@@ -108,14 +114,18 @@ body {
     border: 1px solid transparent;
 }
 
-.nav-item a:hover, .nav-item a.active {
+.nav-item a:hover,
+.nav-item a.active {
     background: rgba(176, 38, 255, 0.1);
     color: var(--text-main);
     border-color: rgba(176, 38, 255, 0.3);
     box-shadow: 0 0 15px rgba(176, 38, 255, 0.2);
 }
 
-.nav-item a i { width: 24px; text-align: center; }
+.nav-item a i {
+    width: 24px;
+    text-align: center;
+}
 
 /* Main Content */
 .main-content {
@@ -136,6 +146,7 @@ body {
     font-size: 2rem;
     background: linear-gradient(90deg, #fff, #a1a1aa);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -246,7 +257,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding-top: 1rem;
-    border-top: 1px solid rgba(255,255,255,0.05);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .product-price {
@@ -261,9 +272,21 @@ body {
     font-size: 0.8rem;
     font-weight: 600;
 }
-.stock-badge.in-stock { background: rgba(0, 255, 157, 0.1); color: var(--neon-green); }
-.stock-badge.low-stock { background: rgba(255, 165, 0, 0.1); color: orange; }
-.stock-badge.out-of-stock { background: rgba(255, 42, 109, 0.1); color: var(--neon-red); }
+
+.stock-badge.in-stock {
+    background: rgba(0, 255, 157, 0.1);
+    color: var(--neon-green);
+}
+
+.stock-badge.low-stock {
+    background: rgba(255, 165, 0, 0.1);
+    color: orange;
+}
+
+.stock-badge.out-of-stock {
+    background: rgba(255, 42, 109, 0.1);
+    color: var(--neon-red);
+}
 
 /* Buttons */
 .btn {
@@ -306,16 +329,20 @@ body {
 .modal {
     display: none;
     position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.8);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(5px);
     z-index: 1000;
     justify-content: center;
     align-items: center;
 }
 
-.modal.active { display: flex; }
+.modal.active {
+    display: flex;
+}
 
 .modal-content {
     background: #18181b;
@@ -343,9 +370,14 @@ body {
     font-size: 1.5rem;
     cursor: pointer;
 }
-.close-btn:hover { color: white; }
 
-.form-group { margin-bottom: 1.5rem; }
+.close-btn:hover {
+    color: white;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
 
 .form-group label {
     display: block;
@@ -357,12 +389,13 @@ body {
 .form-control {
     width: 100%;
     padding: 0.8rem;
-    background: rgba(0,0,0,0.3);
+    background: rgba(0, 0, 0, 0.3);
     border: 1px solid #333;
     border-radius: 8px;
     color: white;
     font-family: var(--font-main);
 }
+
 .form-control:focus {
     outline: none;
     border-color: var(--neon-cyan);
@@ -371,9 +404,17 @@ body {
 
 /* Animations */
 @keyframes glow {
-    0% { box-shadow: 0 0 5px var(--neon-purple); }
-    50% { box-shadow: 0 0 20px var(--neon-purple), 0 0 10px var(--neon-cyan); }
-    100% { box-shadow: 0 0 5px var(--neon-purple); }
+    0% {
+        box-shadow: 0 0 5px var(--neon-purple);
+    }
+
+    50% {
+        box-shadow: 0 0 20px var(--neon-purple), 0 0 10px var(--neon-cyan);
+    }
+
+    100% {
+        box-shadow: 0 0 5px var(--neon-purple);
+    }
 }
 
 .glow-text {

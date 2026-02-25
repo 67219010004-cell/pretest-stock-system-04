@@ -40,16 +40,77 @@ $rmas = $pdo->query($sql)->fetchAll();
 </head>
 <body>
     <div class="app-container">
+        <!-- Sidebar -->
         <nav class="sidebar">
             <div class="brand">
                 <i class="fas fa-microchip"></i>
-                <span>GAME</span>SHOP
+                <span>FIX</span>SHOP
             </div>
+            
+            <!-- User Profile Widget -->
+            <div class="sidebar-user" style="padding: 1rem; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 1rem;">
+                <div style="width: 60px; height: 60px; border-radius: 50%; overflow: hidden; margin: 0 auto; border: 2px solid var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan);">
+                    <?php if (!empty($_SESSION['profile_image'])): ?>
+                        <img src="<?php echo htmlspecialchars($_SESSION['profile_image']); ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                    <?php else: ?>
+                        <div style="width: 100%; height: 100%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: var(--neon-cyan);">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                <div style="margin-top: 0.5rem; color: white; font-weight: bold; font-size: 0.9rem;">
+                    <?php echo htmlspecialchars($_SESSION['full_name'] ?? 'User'); ?>
+                </div>
+            </div>
+
             <ul class="nav-links">
-                <li class="nav-item"><a href="index.php"><i class="fas fa-arrow-left"></i> Dashboard</a></li>
-                <li class="nav-item"><a href="orders.php"><i class="fas fa-box"></i> Orders</a></li>
-                <li class="nav-item"><a href="manage_sn.php"><i class="fas fa-barcode"></i> Manage S/N</a></li>
-                <li class="nav-item"><a href="#" class="active"><i class="fas fa-tools"></i> RMA Cases</a></li>
+                <li class="nav-item">
+                    <a href="index.php">
+                        <i class="fas fa-th-large"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="index.php">
+                        <i class="fas fa-box"></i> Inventory
+                    </a>
+                </li>
+                <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+                <li class="nav-item">
+                    <a href="manage_sn.php">
+                        <i class="fas fa-barcode"></i> Manage S/N
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="manage_rma.php" class="active">
+                        <i class="fas fa-tools"></i> RMA Management
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="manage_users.php">
+                        <i class="fas fa-users"></i> Manage Users
+                    </a>
+                </li>
+                <?php endif; ?>
+                <li class="nav-item">
+                    <a href="profile.php">
+                        <i class="fas fa-user"></i> Profile
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="orders.php">
+                        <i class="fas fa-box"></i> Orders
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="cart.php">
+                        <i class="fas fa-shopping-cart"></i> Cart
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="warranty.php" style="color: var(--neon-cyan);">
+                        <i class="fas fa-shield-alt"></i> Warranty / RMA
+                    </a>
+                </li>
             </ul>
         </nav>
 

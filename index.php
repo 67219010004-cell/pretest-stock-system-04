@@ -93,6 +93,11 @@ try {
                         <i class="fas fa-tools"></i> RMA Management
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="manage_users.php">
+                        <i class="fas fa-users"></i> Manage Users
+                    </a>
+                </li>
                 <?php endif; ?>
                 <li class="nav-item">
                     <a href="profile.php">

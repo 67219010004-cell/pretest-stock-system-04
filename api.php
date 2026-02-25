@@ -177,22 +177,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->beginTransaction();
 
             $product_id = $_POST['product_id'];
-            $supplier_id = $_POST['supplier_id'];
-            $serials = json_decode($_POST['serials'], true); // Expect array of strings
             
-            if (!is_array($serials) || empty($serials)) {
-                throw new Exception("No serial numbers provided");
-            }
-            
-            $quantity = count($serials);
-            $warranty_date = date('Y-m-d', strtotime('+1 year')); // Default 1 year warranty
+            // Check if S/N restock (from manage_sn.php) or Simple restock (from index.php)
+            if (isset($_POST['serials'])) {
+                $supplier_id = $_POST['supplier_id'];
+                $serials = json_decode($_POST['serials'], true);
+                
+                if (!is_array($serials) || empty($serials)) {
+                    throw new Exception("No serial numbers provided");
+                }
+                
+                $quantity = count($serials);
+                $warranty_date = date('Y-m-d', strtotime('+1 year'));
 
-            // 1. Insert Serials
-            $stmt = $pdo->prepare("INSERT INTO product_serials (product_id, supplier_id, serial_number, status, warranty_end_date) VALUES (?, ?, ?, 'available', ?)");
-            
-            foreach ($serials as $sn) {
-                if (empty(trim($sn))) continue;
-                $stmt->execute([$product_id, $supplier_id, trim($sn), $warranty_date]);
+                $stmt = $pdo->prepare("INSERT INTO product_serials (product_id, supplier_id, serial_number, status, warranty_end_date) VALUES (?, ?, ?, 'available', ?)");
+                
+                foreach ($serials as $sn) {
+                    if (empty(trim($sn))) continue;
+                    $stmt->execute([$product_id, $supplier_id, trim($sn), $warranty_date]);
+                }
+            } elseif (isset($_POST['quantity'])) {
+                $quantity = (int)$_POST['quantity'];
             }
 
             // 2. Update Stock Quantity
@@ -470,6 +475,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo json_encode(['success' => true]);
         } catch (Exception $e) {
             $pdo->rollBack();
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
+    elseif ($action === 'admin_update_user') {
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+             echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+             exit();
+        }
+        try {
+            $target_id = $_POST['user_id'];
+            $full_name = $_POST['full_name'];
+            $email = $_POST['email'];
+            $phone = $_POST['phone'];
+            $role = $_POST['role'];
+            
+            $sql = "UPDATE users SET full_name = ?, email = ?, phone = ?, role = ?";
+            $params = [$full_name, $email, $phone, $role];
+
+            if (!empty($_POST['password'])) {
+                $sql .= ", password = ?";
+                $params[] = password_hash($_POST['password'], PASSWORD_DEFAULT);
+            }
+
+            $sql .= " WHERE id = ?";
+            $params[] = $target_id;
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
+            
+            echo json_encode(['success' => true]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
+    elseif ($action === 'admin_delete_user') {
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+             echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+             exit();
+        }
+        try {
+            $id = $_POST['user_id'];
+            if ($id == $_SESSION['user_id']) {
+                throw new Exception("Cannot delete yourself.");
+            }
+            $stmt = $pdo->prepare("DELETE FROM users WHERE id = ?");
+            $stmt->execute([$id]);
+            echo json_encode(['success' => true]);
+        } catch (Exception $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
     }

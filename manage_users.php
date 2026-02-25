@@ -189,18 +189,22 @@ $users = $stmt->fetchAll();
             });
         });
 
-        function deleteUser(id) {
-            if(confirm('Are you sure you want to delete this user? This cannot be undone.')) {
-                const formData = new FormData();
-                formData.append('action', 'admin_delete_user');
-                formData.append('user_id', id);
+        async function deleteUser(id) {
+            if(!confirm('Are you sure you want to delete this user? This cannot be undone.')) return;
 
-                fetch('api.php', { method: 'POST', body: formData })
-                .then(res => res.json())
-                .then(data => {
-                    if(data.success) location.reload();
-                    else alert('Error: ' + data.message);
-                });
+            const formData = new FormData();
+            formData.append('action', 'admin_delete_user');
+            formData.append('user_id', id);
+
+            try {
+                const response = await fetch('api.php', { method: 'POST', body: formData });
+                const data = await response.json();
+                
+                if(data.success) location.reload();
+                else alert('Error: ' + data.message);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while deleting the user.');
             }
         }
 

@@ -221,10 +221,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $name = $_POST['name'];
             $price = $_POST['price'];
             $description = $_POST['description'];
-            // Optional: Category update if needed, keeping it simple for now
+            
+            $imageSql = "";
+            $params = [$name, $price, $description];
 
-            $stmt = $pdo->prepare("UPDATE products SET name = ?, price = ?, description = ? WHERE id = ?");
-            $stmt->execute([$name, $price, $description, $id]);
+            // Handle Image Upload
+            if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+                $uploadDir = 'uploads/';
+                if (!file_exists($uploadDir)) mkdir($uploadDir, 0777, true);
+                
+                $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+                $filename = uniqid() . '.' . $ext;
+                $targetFile = $uploadDir . $filename;
+                
+                if (move_uploaded_file($_FILES['image']['tmp_name'], $targetFile)) {
+                    $imageSql = ", image = ?";
+                    $params[] = $targetFile;
+                }
+            }
+
+            $params[] = $id;
+
+            $stmt = $pdo->prepare("UPDATE products SET name = ?, price = ?, description = ? $imageSql WHERE id = ?");
+            $stmt->execute($params);
             
             echo json_encode(['success' => true]);
         } catch (Exception $e) {

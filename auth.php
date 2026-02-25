@@ -54,8 +54,9 @@ if ($action === 'login') {
     $stmt->execute([$username]);
     $user = $stmt->fetch();
 
-    if ($user && $user['password'] === $password) { // Plaintext for demo
+    if ($user && password_verify($password, $user['password'])) {
         $_SESSION['user_id'] = $user['id'];
+        $_SESSION['username'] = $user['username'];
         $_SESSION['role'] = $user['role'];
         $_SESSION['full_name'] = $user['full_name']; // Load full name
         $_SESSION['profile_image'] = $user['profile_image']; // Load profile image

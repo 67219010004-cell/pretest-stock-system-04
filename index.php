@@ -52,7 +52,7 @@ try {
         <nav class="sidebar">
             <div class="brand">
                 <i class="fas fa-microchip"></i>
-                <span>GAME</span>SHOP
+                <span>FIX</span>SHOP
             </div>
             
             <!-- User Profile Widget -->
@@ -137,7 +137,7 @@ try {
             <header class="header">
                 <div>
                     <h1 class="page-title">Dashboard Overview</h1>
-                    <p style="color: var(--text-muted);">Welcome, <span style="color: var(--neon-cyan); font-weight: bold;"><?php echo htmlspecialchars($_SESSION['username']); ?></span> (<?php echo ucfirst($_SESSION['role']); ?>)</p>
+                    <p style="color: var(--text-muted);">Welcome, <span style="color: var(--neon-cyan); font-weight: bold;"><?php echo htmlspecialchars($_SESSION['username'] ?? 'User'); ?></span> (<?php echo ucfirst($_SESSION['role']); ?>)</p>
                 </div>
                 <div style="display: flex; gap: 1rem;">
                     <?php if ($_SESSION['role'] === 'admin'): ?>
@@ -250,7 +250,7 @@ try {
                 <h2>Add New Product</h2>
                 <button class="close-btn" onclick="closeModal()">&times;</button>
             </div>
-            <form id="addProductForm" action="api.php" method="POST">
+            <form id="addProductForm" action="api.php" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="add_product">
                 
                 <div class="form-group">
@@ -294,7 +294,6 @@ try {
                 </button>
             </form>
         </div>
-        </div>
     </div>
 
     <!-- Restock Modal -->
@@ -329,7 +328,7 @@ try {
                 <h2>Edit Product</h2>
                 <button class="close-btn" onclick="closeEditModal()">&times;</button>
             </div>
-            <form id="editProductForm">
+            <form id="editProductForm" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="update_product">
                 <input type="hidden" name="id" id="edit_product_id">
                 

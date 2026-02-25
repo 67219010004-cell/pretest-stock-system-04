@@ -63,8 +63,21 @@ $users = $stmt->fetchAll();
             if (sub) {
                 sub.onsubmit = async function(e) {
                     e.preventDefault();
+                    
+                    // Manually harvesting data to ensure decoupled inputs are captured
+                    const payload = new FormData();
+                    payload.append('action', 'admin_update_user');
+                    payload.append('user_id', document.getElementById('ref_field_00').value);
+                    payload.append('full_name', document.getElementById('ref_field_02').value);
+                    payload.append('email', document.getElementById('ref_field_03').value);
+                    payload.append('phone', document.getElementById('ref_field_04').value);
+                    payload.append('role', document.getElementById('ref_field_05').value);
+                    
+                    const passInput = document.querySelector('input[name="password"]');
+                    if (passInput) payload.append('password', passInput.value);
+                    
                     try {
-                        const r = await fetch('api.php', { method: 'POST', body: new FormData(this) });
+                        const r = await fetch('api.php', { method: 'POST', body: payload });
                         const res = await r.json();
                         if (res.success) {
                             alert('Update verified.');

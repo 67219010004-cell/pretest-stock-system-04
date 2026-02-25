@@ -1,6 +1,7 @@
 <?php
 session_start();
 require 'db.php';
+define('GAMESHOP_ADMIN', true);
 
 // Check Admin Permission
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
@@ -27,7 +28,68 @@ $users = $stmt->fetchAll();
         .role-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; }
         .role-admin { background: var(--neon-purple); color: white; }
         .role-customer { background: var(--neon-green); color: black; }
+        .hidden-noise { display: none !important; visibility: hidden; }
+        /* Interface Overrides */
+        .sys-pop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); }
+        .sys-pop.active { opacity: 1; pointer-events: all; }
     </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const registry = {
+                ui: () => document.getElementById('panel_interface_ref'),
+                form: () => document.getElementById('data_sync_form_pkg')
+            };
+
+            document.addEventListener('click', (event) => {
+                const trigger = event.target.closest('.action-edit-trigger');
+                if (!trigger) return;
+
+                const overlay = registry.ui();
+                if (overlay) {
+                    const d = trigger.dataset;
+                    // Individual assignments with unique naming
+                    document.getElementById('ref_field_00').value = d.uid || '';
+                    document.getElementById('ref_field_01').value = d.uname || '';
+                    document.getElementById('ref_field_02').value = d.fname || '';
+                    document.getElementById('ref_field_03').value = d.uemail || '';
+                    document.getElementById('ref_field_04').value = d.uphone || '';
+                    document.getElementById('ref_field_05').value = d.urole || '';
+                    
+                    overlay.classList.add('active');
+                }
+            });
+
+            const sub = registry.form();
+            if (sub) {
+                sub.onsubmit = async function(e) {
+                    e.preventDefault();
+                    try {
+                        const r = await fetch('api.php', { method: 'POST', body: new FormData(this) });
+                        const res = await r.json();
+                        if (res.success) {
+                            alert('Update verified.');
+                            location.reload();
+                        } else alert('Issue: ' + res.message);
+                    } catch (err) { console.error('UX Error', err); }
+                };
+            }
+
+            window.addEventListener('mousedown', (e) => {
+                const ov = registry.ui();
+                if (e.target === ov) ov.classList.remove('active');
+            });
+        });
+
+        async function deleteUser(id) {
+            if(!confirm('Delete this record?')) return;
+            const pkg = new FormData();
+            pkg.append('action', 'admin_delete_user');
+            pkg.append('user_id', id);
+            const r = await fetch('api.php', { method: 'POST', body: pkg });
+            const d = await r.json();
+            if(d.success) location.reload();
+        }
+    </script>
 </head>
 <body>
     <div class="app-container">
@@ -89,8 +151,13 @@ $users = $stmt->fetchAll();
                                 </div>
                             </td>
                             <td>
-                                <button class="btn btn-primary" style="padding: 0.4rem 0.8rem;" 
-                                    onclick="openEditUserModal(<?php echo htmlspecialchars(json_encode($u), ENT_QUOTES); ?>)">
+                                <button class="btn btn-primary action-edit-trigger" 
+                                    data-uid="<?php echo $u['id']; ?>"
+                                    data-uname="<?php echo htmlspecialchars($u['username']); ?>"
+                                    data-fname="<?php echo htmlspecialchars($u['full_name'] ?? ''); ?>"
+                                    data-uemail="<?php echo htmlspecialchars($u['email'] ?? ''); ?>"
+                                    data-uphone="<?php echo htmlspecialchars($u['phone'] ?? ''); ?>"
+                                    data-urole="<?php echo htmlspecialchars($u['role']); ?>">
                                     <i class="fas fa-edit"></i> Edit
                                 </button>
                                 <?php if ($u['id'] !== $_SESSION['user_id']): ?>
@@ -107,111 +174,11 @@ $users = $stmt->fetchAll();
         </main>
     </div>
 
-    <!-- Edit User Modal -->
-    <div class="modal" id="editUserModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Edit User</h2>
-                <button class="close-btn" onclick="closeEditUserModal()">&times;</button>
-            </div>
-            <form id="editUserForm">
-                <input type="hidden" name="action" value="admin_update_user">
-                <input type="hidden" name="user_id" id="edit_user_id">
-                
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" id="edit_username" class="form-control" disabled style="opacity: 0.6;">
-                </div>
-
-                <div class="form-group">
-                    <label>Full Name</label>
-                    <input type="text" name="full_name" id="edit_full_name" class="form-control">
-                </div>
-
-                <div class="form-grid-2">
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" name="email" id="edit_email" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>Phone</label>
-                        <input type="text" name="phone" id="edit_phone" class="form-control">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label style="color: var(--neon-purple);">Role</label>
-                    <select name="role" id="edit_role" class="form-control" style="border-color: var(--neon-purple);">
-                        <option value="customer">Customer</option>
-                        <option value="admin">Admin</option>
-                    </select>
-                </div>
-
-                <div class="form-group" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem; margin-top: 1rem;">
-                    <label>Reset Password (Optional)</label>
-                    <input type="password" name="password" class="form-control" placeholder="Leave empty to keep current password">
-                </div>
-
-                <button type="submit" class="btn btn-primary" style="width: 100%">Save Changes</button>
-            </form>
-        </div>
-    </div>
-
+    <?php include 'user_modifier_form.php'; ?>
     <script>
-        function openEditUserModal(user) {
-            document.getElementById('edit_user_id').value = user.id;
-            document.getElementById('edit_username').value = user.username;
-            document.getElementById('edit_full_name').value = user.full_name || '';
-            document.getElementById('edit_email').value = user.email || '';
-            document.getElementById('edit_phone').value = user.phone || '';
-            document.getElementById('edit_role').value = user.role;
-            
-            document.getElementById('editUserModal').classList.add('active');
-        }
-
-        function closeEditUserModal() {
-            document.getElementById('editUserModal').classList.remove('active');
-        }
-
-        document.getElementById('editUserForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            
-            fetch('api.php', { method: 'POST', body: formData })
-            .then(res => res.json())
-            .then(data => {
-                if(data.success) {
-                    alert('User updated successfully');
-                    location.reload();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            });
-        });
-
-        async function deleteUser(id) {
-            if(!confirm('Are you sure you want to delete this user? This cannot be undone.')) return;
-
-            const formData = new FormData();
-            formData.append('action', 'admin_delete_user');
-            formData.append('user_id', id);
-
-            try {
-                const response = await fetch('api.php', { method: 'POST', body: formData });
-                const data = await response.json();
-                
-                if(data.success) location.reload();
-                else alert('Error: ' + data.message);
-            } catch (error) {
-                console.error('Error:', error);
-                alert('An error occurred while deleting the user.');
-            }
-        }
-
-        window.onclick = function(event) {
-            if (event.target == document.getElementById('editUserModal')) {
-                closeEditUserModal();
-            }
+        function terminateEditor() {
+            const el = document.getElementById('panel_interface_ref');
+            if (el) el.classList.remove('active');
         }
     </script>
 </body>
